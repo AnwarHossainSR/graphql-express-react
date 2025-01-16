@@ -4,6 +4,7 @@ const { graphqlHTTP } = require("express-graphql");
 const connectDB = require("./config/db");
 const schema = require("./schema");
 const cors = require("cors");
+const authMiddleware = require("./middleware");
 
 const app = express();
 
@@ -17,10 +18,12 @@ connectDB();
 // GraphQL API
 app.use(
   "/graphql",
-  graphqlHTTP({
+  authMiddleware,
+  graphqlHTTP((req) => ({
     schema,
+    context: { user: req.user },
     graphiql: true,
-  })
+  }))
 );
 
 // Start server
